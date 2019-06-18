@@ -1,0 +1,122 @@
+<html>
+
+    <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>History page</title>
+    <style>
+        .navigationButtons {
+            -moz-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            -webkit-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ff5bb0), color-stop(1, #ef027d));
+            background:-moz-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-webkit-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-o-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-ms-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:linear-gradient(to bottom, #ff5bb0 5%, #ef027d 100%);
+            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bb0', endColorstr='#ef027d',GradientType=0);
+            background-color:#ff5bb0;
+            -moz-border-radius:6px;
+            -webkit-border-radius:6px;
+            border-radius:6px;
+            border:1px solid #ee1eb5;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:6px 24px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #c70067;
+        }
+        .navigationButtons:hover {
+            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ef027d), color-stop(1, #ff5bb0));
+            background:-moz-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-webkit-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-o-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-ms-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:linear-gradient(to bottom, #ef027d 5%, #ff5bb0 100%);
+            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0',GradientType=0);
+            background-color:#ef027d;
+        }
+        .navigationButtons:active {
+            position:relative;
+            top:1px;
+        }
+        .images {
+            width: 100%;
+            height: 100%;
+        }
+
+        img{
+        width:100%;
+        height: 80%;
+        text-align:center;
+        margin: 10px;
+    }
+        
+    </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    </head>
+
+
+
+ <body>
+     <div class="container">
+        <a href="frontPage.html" class="navigationButtons">Front page</a>
+    </div>
+    <div id="imageNames"></div>
+    <div id="images" class="images"></div>
+
+    <script>
+        window.onload = function() {
+            getImages();
+            function getImages(){
+                $(document).ready(function() {
+                    $.ajax({
+                    type: "GET",
+                    url: "images/fileNames.csv",
+                    dataType: "text",
+
+                    success: function(data) {
+                        console.log(data);
+                        let aRows = data.split(/\r\n|\n/);
+                        console.log(aRows);
+
+                        for(var i=0; i<aRows.length; i++){
+                            let row = aRows[i].split(",");
+                            //get img if not empty string
+                            if (row[0]) {
+                                console.log(row[0]);
+                                let image = new Image();
+
+                                console.log(image);
+                                                          
+                                image.src = "images/" + row[0]+".png";
+                                
+                                //let div = document.getElementById("imageNames");
+                                image.addEventListener("load", function(){
+                                    console.log("image loaded");
+                                    document.getElementById("images").appendChild(this);
+                                });
+                            }
+                        }
+                    }	
+                    });
+                });  
+            }
+        }
+    </script>
+        
+ </body>
+
+</html>
+ 

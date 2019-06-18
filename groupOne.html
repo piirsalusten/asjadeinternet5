@@ -1,0 +1,202 @@
+<html>
+
+    <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>group One</title>
+    <style>
+        .navigationButtons {
+            -moz-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            -webkit-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            box-shadow:inset 0px 1px 0px 0px #fbafe3;
+            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ff5bb0), color-stop(1, #ef027d));
+            background:-moz-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-webkit-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-o-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:-ms-linear-gradient(top, #ff5bb0 5%, #ef027d 100%);
+            background:linear-gradient(to bottom, #ff5bb0 5%, #ef027d 100%);
+            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bb0', endColorstr='#ef027d',GradientType=0);
+            background-color:#ff5bb0;
+            -moz-border-radius:6px;
+            -webkit-border-radius:6px;
+            border-radius:6px;
+            border:1px solid #ee1eb5;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:6px 24px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #c70067;
+        }
+        .navigationButtons:hover {
+            background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ef027d), color-stop(1, #ff5bb0));
+            background:-moz-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-webkit-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-o-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:-ms-linear-gradient(top, #ef027d 5%, #ff5bb0 100%);
+            background:linear-gradient(to bottom, #ef027d 5%, #ff5bb0 100%);
+            filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0',GradientType=0);
+            background-color:#ef027d;
+        }
+        .navigationButtons:active {
+            position:relative;
+            top:1px;
+        }
+        .container {
+            width: 100%;
+            height: 50%;
+        }
+    </style>
+
+     <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+     <script src="../c3/c3.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+</head>
+
+
+
+ <body>
+     <div class="headerContainer">
+        <a href="frontPage.html" class="navigationButtons">Front page</a>
+    </div>
+    <br><br>
+    <div class="graphSelection">
+        <select id="data">
+            <option value="0">Temperatuur</option>
+            <option value="1">Vee tase</option>
+            <option value="2">Valgus</option>
+        </select><br><br>
+        <select id="graph">
+            <option value="bar">Bar</option>
+            <option value="pie">Pie</option>
+            <option value="spline">Spline</option>
+            <option value="scatter">Scatter</option>
+            <option value="line">Line</option>
+        </select>
+        <br><br>
+        <button id="createGraph" onClick="createGraph()">Genereeri graafik</button>
+        <button id="saveGraph" onClick="saveGraph()">Salvesta graafik</button>
+    </div>
+    <div class="container">
+            <canvas id="myChart" class="graph graph1"></canvas>
+    </div>
+
+    <script>
+
+        function getData() {
+            let aData = [];
+            d3.csv("../AqData2.csv", function(data) {
+                aData.push(data);
+            });
+            return aData;
+        }
+
+        let aGroupData = getData();
+
+        function createGraph() {
+            let sGraphType = document.getElementById("graph").value;
+            let iDataType = (document.getElementById("data").value);
+
+            let oTypes = {
+                0: "Temperatuur",
+                1: "Vee tase",
+                2: "Valgus"
+            };
+
+            let sLabel = oTypes[iDataType];
+            let aData;
+
+            if (+iDataType === 0) {
+                aData = aGroupData.map(function (oData){
+                    return oData.Temperature;
+                });
+            } else if (+iDataType === 1) {
+                aData = aGroupData.map(function (oData){
+                    return oData.WaterLevel;
+                });
+            } else  if (+iDataType === 2) {
+                aData = aGroupData.map(function (oData){
+                    return oData.LightLevel;
+                });
+            }
+
+            let aLabels = aGroupData.map(function (oData) {
+                return oData.Timestamp;
+            });
+
+            console.log(aData);
+            console.log(aLabels);
+            console.log(sGraphType);
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: sGraphType,
+                data: {
+                    labels: aLabels,
+                    datasets: [{
+                        label: sLabel,    
+                        data: aData,
+                        backgroundColor: "#3cba9f"
+                    }]
+                },
+                options: {
+                }
+            });
+        }
+
+        function saveGraph() {
+            let canvas = document.getElementById('myChart');
+            let dataURL = canvas.toDataURL();
+            let iDataType = parseInt(document.getElementById("data").value)
+
+            let oTypes = {
+                0: "Temperatuur",
+                1: "Vee tase",
+                2: "Valgus"
+            };
+
+            let sType = oTypes[iDataType];
+            let time = new Date().getTime();
+            let sFileName = "group1" + sType + time;
+
+            console.log(sFileName);
+
+            html2canvas($(".graph1")[0]).then(function(canvas) {
+                console.log(canvas);
+                let image = canvas.toDataURL();
+                console.log(image);
+                image = image.substring(image.indexOf(',') + 1)
+                image.replace(" ", "+")
+                console.log(image);
+                
+                $.ajax({
+                url: "save.php",
+                type: "POST",
+                data: {
+                    "image": image,
+                    "filename": sFileName
+                }
+                });
+                
+            });
+
+            
+            
+        }
+    </script>
+        
+ </body>
+
+</html>
+ 
