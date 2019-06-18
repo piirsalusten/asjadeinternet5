@@ -47,14 +47,187 @@
             position:relative;
             top:1px;
         }
+        .container {
+            width: 100%;
+            height: 50%;
+        }
     </style>
+
+     <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+     <script src="../c3/c3.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+</head>
 
 
 
  <body>
-     <div class="container">
+     <div class="headerContainer">
         <a href="frontPage.html" class="navigationButtons">Front page</a>
     </div>
+    <br><br>
+    <div class="graphSelection">
+        <select id="data">
+            <option value="0">Temperatuur</option>
+            <option value="1">Vee tase</option>
+            <option value="2">Valgus</option>
+        </select><br><br>
+        <select id="graph">
+            <option value="bar">Bar</option>
+            <option value="horizontalBar">horizontalBar</option>
+            <option value="line">Line</option>
+        </select>
+        <br><br>
+        <button id="createGraph" onClick="createGraph()">Genereeri graafik</button>
+        <button id="saveGraph" onClick="saveGraph()">Salvesta graafik</button>
+    </div>
+    <div class="container">
+            <canvas id="myChart" class="graph graph1"></canvas>
+    </div>
+
+    <script>
+
+        function getData() {
+            let aData = [];
+            d3.csv("./group3.csv", function(data) {
+                aData.push(data);
+            });
+            return aData;
+        }
+
+        let aGroupData = getData();
+
+        function createGraph() {
+            let sGraphType = document.getElementById("graph").value;
+            let iDataType = (document.getElementById("data").value);
+
+            let oTypes = {
+                0: "Temperatuur",
+                1: "Vee tase",
+                2: "Valgus"
+            };
+
+            let sLabel = oTypes[iDataType];
+            let aData;
+
+            if (+iDataType === 0) {
+                aData = aGroupData.map(function (oData){
+                    return oData.Temperature;
+                });
+            } else if (+iDataType === 1) {
+                aData = aGroupData.map(function (oData){
+                    return oData.WaterLevel;
+                });
+            } else  if (+iDataType === 2) {
+                aData = aGroupData.map(function (oData){
+                    return oData.LightLevel;
+                });
+            }
+
+            let aLabels = aGroupData.map(function (oData) {
+                return oData.Date + oData.Time;
+            });
+
+            console.log(aData);
+            console.log(aLabels);
+            console.log(sGraphType);
+
+            if (sGraphType === "line") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: sGraphType,
+                    data: {
+                        labels: aLabels,
+                        datasets: [{
+                            label: sLabel,    
+                            data: aData,
+                            backgroundColor: "#3cba9f"
+                        }]
+                    },
+                    options: {
+                    }
+                });
+            } else if(sGraphType === "horizontalBar") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: sGraphType,
+                        data: {
+                            labels: aLabels,
+                            datasets: [{
+                                label: sLabel,    
+                                data: aData,
+                                backgroundColor: "#3e95cd"
+                            }]
+                        },
+                        options: {
+                        }
+                    });
+            } else if(sGraphType === "bar") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: sGraphType,
+                        data: {
+                            labels: aLabels,
+                            datasets: [{
+                                label: sLabel,    
+                                data: aData,
+                                backgroundColor: "#3e95cd",
+                                borderColor: "#3e95cd",
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            beginAtZero: true
+                        }
+                    });
+            }
+        }
+
+        function saveGraph() {
+            let canvas = document.getElementById('myChart');
+            let dataURL = canvas.toDataURL();
+            let iDataType = parseInt(document.getElementById("data").value)
+
+            let oTypes = {
+                0: "Temperatuur",
+                1: "Vee tase",
+                2: "Valgus"
+            };
+
+            let sType = oTypes[iDataType];
+            let time = new Date().getTime();
+            let sFileName = "group1" + sType + time;
+
+            console.log(sFileName);
+
+            html2canvas($(".graph1")[0]).then(function(canvas) {
+                console.log(canvas);
+                let image = canvas.toDataURL();
+                console.log(image);
+                image = image.substring(image.indexOf(',') + 1)
+                image.replace(" ", "+")
+                console.log(image);
+                
+                $.ajax({
+                url: "save.php",
+                type: "POST",
+                data: {
+                    "image": image,
+                    "filename": sFileName
+                }
+                });
+                
+            });
+
+            
+            
+        }
+    </script>
         
  </body>
 

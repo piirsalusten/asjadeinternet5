@@ -79,9 +79,7 @@
         </select><br><br>
         <select id="graph">
             <option value="bar">Bar</option>
-            <option value="pie">Pie</option>
-            <option value="spline">Spline</option>
-            <option value="scatter">Scatter</option>
+            <option value="horizontalBar">horizontalBar</option>
             <option value="line">Line</option>
         </select>
         <br><br>
@@ -139,20 +137,55 @@
             console.log(aLabels);
             console.log(sGraphType);
 
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: sGraphType,
-                data: {
-                    labels: aLabels,
-                    datasets: [{
-                        label: sLabel,    
-                        data: aData,
-                        backgroundColor: "#3cba9f"
-                    }]
-                },
-                options: {
-                }
-            });
+            if (sGraphType === "line") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: sGraphType,
+                    data: {
+                        labels: aLabels,
+                        datasets: [{
+                            label: sLabel,    
+                            data: aData,
+                            backgroundColor: "#3cba9f"
+                        }]
+                    },
+                    options: {
+                    }
+                });
+            } else if(sGraphType === "horizontalBar") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: sGraphType,
+                        data: {
+                            labels: aLabels,
+                            datasets: [{
+                                label: sLabel,    
+                                data: aData,
+                                backgroundColor: "#3e95cd"
+                            }]
+                        },
+                        options: {
+                        }
+                    });
+            } else if(sGraphType === "bar") {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: sGraphType,
+                        data: {
+                            labels: aLabels,
+                            datasets: [{
+                                label: sLabel,    
+                                data: aData,
+                                backgroundColor: "#3e95cd",
+                                borderColor: "#3e95cd",
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            beginAtZero: true
+                        }
+                    });
+            }
         }
 
         function saveGraph() {
